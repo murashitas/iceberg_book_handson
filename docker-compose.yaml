@@ -1,0 +1,203 @@
+services:
+  jupyter:
+    build:
+      context: ./jupyter
+    depends_on:
+      server:
+        condition: service_started
+      minio:
+        condition: service_started
+    command: >
+      /bin/bash -c "
+      start-notebook.sh --NotebookApp.token=''"
+    volumes:
+      - ./examples:/home/jovyan/examples/
+      - data:/home/jovyan/data/
+      - ./.pyiceberg.yaml:/home/jovyan/.pyiceberg.yaml
+    environment:
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+    networks:
+      iceberg_handson_net:
+        aliases:
+          - jupyter
+    ports:
+      - "8888:8888"
+
+  server:
+    image: apache/iceberg-rest-fixture:1.8.1
+    container_name: iceberg-rest
+    networks:
+      iceberg_handson_net:
+        aliases:
+          - iceberg-rest
+    ports:
+      - 8181:8181
+    environment:
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+      - CATALOG_WAREHOUSE=s3://amzn-s3-demo-bucket
+      - CATALOG_IO__IMPL=org.apache.iceberg.aws.s3.S3FileIO
+      - CATALOG_S3_ENDPOINT=http://minio:9000
+
+  minio:
+    image: bitnami/minio:latest
+    container_name: minio
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+      - MINIO_DOMAIN=minio
+      - MINIO_API_PORT_NUMBER=9000
+      - MINIO_CONSOLE_PORT_NUMBER=9001
+      - MINIO_SCHEME=http
+      - MINIO_DEFAULT_BUCKETS=amzn-s3-demo-bucket:public
+    healthcheck:
+      test: [ "CMD", "mc", "ls", "local", "|", "grep", "amzn-s3-demo-bucket" ]
+      interval: 2s
+      timeout: 10s
+      retries: 2
+      start_period: 15s
+    networks:
+      iceberg_handson_net:
+        aliases:
+          - minio
+          - amzn-s3-demo-bucket.minio
+    ports:
+      - 9001:9001
+      - 9000:9000
+
+  flink-jobmanager:
+    build: ./flink
+    container_name: flink-jobmanager
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+      - JAVA_OPTS=-Daws.region=us-east-1
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        jobmanager.classloader.resolve-order: parent-first
+        jobmanager.classloader.parent-first-patterns.additional: org.apache.iceberg.*
+        jobmanager.memory.process.size: 1600m
+        s3.endpoint: http://minio:9000
+        s3.path.style.access: true
+        s3.access-key: admin
+        s3.secret-key: password
+        aws.region: us-east-1
+        aws.credentials.provider: BASIC
+        aws.access-key-id: admin
+        aws.secret-access-key: password
+    networks:
+      iceberg_handson_net:
+        aliases:
+          - flink
+
+  flink-taskmanager:
+    build: ./flink
+    container_name: flink-taskmanager
+    depends_on:
+      - flink-jobmanager
+    command: taskmanager
+    scale: 1
+    environment:
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+      - JAVA_OPTS=-Daws.region=us-east-1
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        taskmanager.classloader.resolve-order: parent-first
+        taskmanager.classloader.parent-first-patterns.additional: org.apache.iceberg.*
+        taskmanager.numberOfTaskSlots: 2
+        taskmanager.memory.process.size: 2048m
+        taskmanager.memory.task.heap.size: 1024m
+        taskmanager.memory.managed.size: 128m
+        s3.endpoint: http://minio:9000
+        s3.path.style.access: true
+        s3.access-key: admin
+        s3.secret-key: password
+        aws.region: us-east-1
+        aws.credentials.provider: BASIC
+        aws.access-key-id: admin
+        aws.secret-access-key: password
+    networks:
+      iceberg_handson_net:
+        aliases:
+          - flink
+
+  flink-sql-client:
+    build: ./flink
+    container_name: flink-sql-client
+    command: bin/sql-client.sh -i /opt/flink/init.sql
+    depends_on:
+      - flink-jobmanager
+    environment:
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+      - JAVA_OPTS=-Daws.region=us-east-1
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager
+        rest.address: flink-jobmanager
+    networks:
+      iceberg_handson_net:
+        aliases:
+          - flink
+
+  trino:
+    image: trinodb/trino:latest
+    container_name: trino
+    hostname: trino
+    environment:
+      - CATALOG_MANAGEMENT=dynamic
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+    healthcheck:
+      test: [ "CMD", "curl", "-I", "http://localhost:8080/v1/status" ]
+      interval: 2s
+      timeout: 10s
+      retries: 2
+      start_period: 10s
+    volumes:
+      - ./trino/etc:/etc/trino
+    ports:
+      - "8085:8085"
+    networks:
+      - iceberg_handson_net
+
+  hive:
+    build:
+      context: ./hive
+    container_name: hive
+    hostname: hive4
+    environment:
+      - SERVICE_NAME=hiveserver2
+      - HIVE_CUSTOM_CONF_DIR=/opt/hive/iceberg-conf
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+    volumes:
+      - ./hive/conf:/opt/hive/iceberg-conf
+      - data:/home/jovyan/data/
+    ports:
+      - "10000:10000"
+      - "10002:10002"
+    networks:
+      iceberg_handson_net:
+        aliases:
+          - hive
+
+volumes:
+  data:
+
+networks:
+  iceberg_handson_net:

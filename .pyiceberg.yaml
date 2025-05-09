@@ -1,0 +1,6 @@
+catalog:
+  default:
+    type: rest
+    uri: http://server:8181
+    s3.region: ap-northeast-1
+    s3.endpoint: http://minio:9000
