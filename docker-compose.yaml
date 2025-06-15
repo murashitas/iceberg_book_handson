@@ -196,8 +196,31 @@ services:
         aliases:
           - hive
 
+  superset:
+    image: apache/superset:latest
+    container_name: superset
+    environment:
+      - SUPERSET_SECRET_KEY=supersecretkey
+      - SUPERSET_LOAD_EXAMPLES=no
+    ports:
+      - "8088:8088"
+    volumes:
+      - superset_home:/app/superset_home
+    depends_on:
+      - trino
+    networks:
+      - iceberg_handson_net
+    command: >
+      /bin/bash -c "
+      pip install trino &&
+      superset db upgrade &&
+      superset fab create-admin --username admin --firstname Admin --lastname User --email admin@example.com --password admin &&
+      superset init &&
+      superset run -h 0.0.0.0 -p 8088 --with-threads --reload"
+
 volumes:
   data:
+  superset_home:
 
 networks:
   iceberg_handson_net:
