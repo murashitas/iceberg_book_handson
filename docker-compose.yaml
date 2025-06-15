@@ -218,7 +218,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
-      CLUSTER_ID: 'WebAcceeLogsKafkaCluster'
+      CLUSTER_ID: 'WebAccessLogsKafkaCluster'
     networks:
       iceberg_handson_net:
         aliases:
