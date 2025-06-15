@@ -1,6 +1,6 @@
 FROM quay.io/jupyter/pyspark-notebook:spark-3.5.3
 
-RUN pip install boto3 jupysql avro --user
+RUN pip install boto3 jupysql avro kafka-python --user
 
 RUN mkdir -p /home/jovyan/.ipython/profile_default
 RUN chown -R jovyan:users /home/jovyan/.ipython
