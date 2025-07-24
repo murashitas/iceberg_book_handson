@@ -1,6 +1,10 @@
 FROM quay.io/jupyter/pyspark-notebook:spark-3.5.3
 
+<<<<<<< HEAD
 RUN pip install boto3 jupysql avro kafka-python --user
+=======
+RUN pip install boto3 jupysql avro --user
+>>>>>>> a5ceb8d (Initialize Handson repository)
 
 RUN mkdir -p /home/jovyan/.ipython/profile_default
 RUN chown -R jovyan:users /home/jovyan/.ipython
