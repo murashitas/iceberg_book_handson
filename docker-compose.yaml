@@ -196,7 +196,6 @@ services:
         aliases:
           - hive
 
-<<<<<<< HEAD
   kafka:
     image: apache/kafka:3.7.0
     platform: linux/amd64
@@ -225,8 +224,6 @@ services:
         aliases:
           - kafka
 
-=======
->>>>>>> a5ceb8d (Initialize Handson repository)
 volumes:
   data:
 
