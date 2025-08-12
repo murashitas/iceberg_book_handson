@@ -65,8 +65,28 @@ services:
           - minio
           - amzn-s3-demo-bucket.minio
     ports:
-      - 9001:9001
       - 9000:9000
+
+  minio-console:
+    image: bitnami/minio-object-browser:latest
+    container_name: minio-console
+    entrypoint: ["/opt/bitnami/minio-object-browser/bin/console", "server"]
+    environment:
+      - MINIO_SERVER_HOST=minio
+      - MINIO_SERVER_PORT_NUMBER=9000
+      - MINIO_SERVER_ACCESS_KEY=admin
+      - MINIO_SERVER_SECRET_KEY=password
+      - CONSOLE_PBKDF_PASSPHRASE=SECRET
+      - CONSOLE_PBKDF_SALT=SECRET
+      - CONSOLE_MINIO_SERVER=http://minio:9000
+    ports:
+      - "9001:9090"  # 9090に変更
+    depends_on:
+      - minio
+    networks:
+      iceberg_handson_net:
+        aliases:
+          - minio-console
 
   flink-jobmanager:
     build: ./flink
@@ -248,7 +268,7 @@ services:
 
 volumes:
   data:
-  superset_home
+  superset_home:
 
 networks:
   iceberg_handson_net:
