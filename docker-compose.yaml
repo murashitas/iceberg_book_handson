@@ -80,7 +80,7 @@ services:
       - CONSOLE_PBKDF_SALT=SECRET
       - CONSOLE_MINIO_SERVER=http://minio:9000
     ports:
-      - "9001:9090"  # 9090に変更
+      - "9001:9090"
     depends_on:
       - minio
     networks:
