@@ -1,0 +1,8 @@
+{"product_name":"coffee beans","price":12.50,"customer_id":1627,"order_id":"DR89TYUI45FG23","created_at":"2025-04-27T08:14:56Z","category":"drink"}
+{"product_name":"rice","price":5.99,"customer_id":1784,"order_id":"GR34FDSA78HJ90","created_at":"2025-04-26T19:27:42Z","category":"grocery"}
+{"product_name":"blender","price":49.99,"customer_id":1542,"order_id":"KB12ZXCV45BN78","created_at":"2025-04-27T13:52:19Z","category":"kitchen"}
+{"product_name":"sparkling water","price":1.25,"customer_id":1876,"order_id":"DR67QWER12TY45","created_at":"2025-04-25T15:41:08Z","category":"drink"}
+{"product_name":"measuring cups","price":7.50,"customer_id":1639,"order_id":"KB90PLOK23JH67","created_at":"2025-04-26T10:33:27Z","category":"kitchen"}
+{"product_name":"cereal","price":4.29,"customer_id":1702,"order_id":"GR56MNBV78CV34","created_at":"2025-04-27T07:19:54Z","category":"grocery"}
+{"product_name":"frying pan","price":24.99,"customer_id":1825,"order_id":"KB78TYUI34GH56","created_at":"2025-04-25T12:46:31Z","category":"kitchen"}
+{"product_name":"lemonade","price":2.75,"customer_id":1563,"order_id":"DR23ASDF67JK90","created_at":"2025-04-26T14:38:12Z","category":"drink"}

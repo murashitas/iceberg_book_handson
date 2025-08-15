@@ -33,10 +33,10 @@ https://gihyo.jp/book/2025/978-4-297-15074-7
 #### 8章 PyIceberg
 - [examples/ch8-pyiceberg.ipynb](examples/ch8-pyiceberg.ipynb)
 #### 9章 ユースケースとソリューションパターン
-- [examples/ch9-1-basic-pipeline.ipynb](examples/ch9-1-basic-pipeline.ipynb)
+- [examples/ch9-basic-pipeline.ipynb](examples/ch9-basic-pipeline.ipynb)
 - [examples/ch9-cdc.ipynb](examples/ch9-cdc.ipynb)
 - [examples/ch9-wap.ipynb](examples/ch9-wap.ipynb)
-- [examples/ch9-4-streaming.ipynb](examples/ch9-4-streaming.ipynb)
+- [examples/ch9-streaming.ipynb](examples/ch9-streaming.ipynb)
 
 ## ハンズオン環境の構成
 
@@ -44,7 +44,7 @@ Icebergの実験に必要なコンポーネントが`docker-compose.yml`に纏�
 主に以下のコンテナによって構成されています。  
 
 * **jupyter**
-   * PyIcebergとJupyter Notebookを動かすコンテナです
+   * PySpark、PyIcebergとJupyter Notebookを動かすコンテナです
    * 8888番ポートでJupyter Notebookが起動します
    * examplesディレクトリとdataディレクトリがマウントされ、ハンズオン用のノートブックを実行できます
 
@@ -71,9 +71,9 @@ Icebergの実験に必要なコンポーネントが`docker-compose.yml`に纏�
    * 動的カタログ管理が有効化されています
 
 * **hive**
-   * Apache Hive Metastoreサービスを提供するコンテナです
+   * Apache Hive, Hive メタストアサービスを提供するコンテナです
    * 10000番ポートでHiveServer2、10002番ポートでWeb UIにアクセスできます
-   * Icebergテーブルのメタデータ管理に利用されます
+   * Icebergテーブルの操作やメタデータ管理に利用されます
 
 * **superset**
    * Apache Supersetを起動し、データの可視化とダッシュボード機能を提供します
@@ -116,4 +116,12 @@ docker-compose up --build
 
 `localhost:9001`にアクセスするとログイン画面が表示されます。  
 
-UsernameとPasswordはdocker-compose.ymlに記載の通り、Username=admin, Password=passwordです。(適宜変更してください)  
+UsernameとPasswordはdocker-compose.ymlに記載の通り、Username=admin, Password=passwordです。(適宜変更してください)
+
+## MinIO にファイルをアップロードする
+
+本書におけるいくつかの例において、事前にサンプルファイルをMinIO object browser経由でアップロードする必要があります。以下のステップの通りにパスの作成およびファイルのアップロードを行ってください。
+
+1. ローカルのWebブラウザ経由で`localhost:9001`にアクセスし、ログインします
+2. ログイン後、画面右上に表示されている**Create new path**より、バケット配下にパスを作成できます
+3. 画面右上に表示されている**Upload**を選択し、**Upload File**を選択します。その後アップロードするファイルを選択することで、現在のパス配下にファイルをアップロードできます
