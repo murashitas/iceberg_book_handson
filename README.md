@@ -16,16 +16,32 @@ https://gihyo.jp/book/2025/978-4-297-15074-7
 > [!WARNING]
 > 本環境はあくまでも実験用で、最小限のマシンリソースで簡易的な検証を実現することに主眼を置いています。本番環境での運用を想定した設計ではないため、本番向けにはパフォーマンスやセキュリティ、信頼性などの非機能面を考慮した追加の設計の検討が必要である点に注意してください。
 
+## ハンズオンコンテンツ一覧
+各章とハンズオンコンテンツの対応は以下の通りです。
+#### 2章 Apache Icebergの仕組みと機能
+- [examples/ch2-query-lifecycle.ipynb](examples/ch2-query-lifecycle.ipynb)
+#### 3章 Icebergカタログとストレージ
+- [examples/ch3-rest-catalog.ipynb](examples/ch3-rest-catalog.ipynb)
+#### 4章 Apache Spark
+- [examples/ch4-spark-1.ipynb](examples/ch4-spark-1.ipynb)
+- [examples/ch4-spark-2-iceberg-example.ipynb](examples/ch4-spark-2-iceberg-example.ipynb)
+- [examples/ch4-spark-3-iceberg.ipynb](examples/ch4-spark-3-iceberg.ipynb)
+#### 5章 Apache Flink
+#### 6章 Trino
+- [examples/ch6-trino.ipynb](examples/ch6-trino.ipynb)
+#### 7章 Apache Hive
+#### 8章 PyIceberg
+- [examples/ch8-pyiceberg.ipynb](examples/ch8-pyiceberg.ipynb)
+#### 9章 ユースケースとソリューションパターン
+- [examples/ch9-1-basic-pipeline.ipynb](examples/ch9-1-basic-pipeline.ipynb)
+- [examples/ch9-cdc.ipynb](examples/ch9-cdc.ipynb)
+- [examples/ch9-wap.ipynb](examples/ch9-wap.ipynb)
+- [examples/ch9-4-streaming.ipynb](examples/ch9-4-streaming.ipynb)
+
 ## ハンズオン環境の構成
 
 Icebergの実験に必要なコンポーネントが`docker-compose.yml`に纏まっています。
 主に以下のコンテナによって構成されています。  
-
-Docker Compose定義ファイルを確認したところ、README.mdに記載されていないサービスがいくつか存在しています。以下、ハンズオン環境の構成について情報を追加します：
-
-## ハンズオン環境の構成
-
-Icebergの実験に必要なコンポーネントが`docker-compose.yml`に纏まっています。主に以下のコンテナによって構成されています。
 
 * **jupyter**
    * PyIcebergとJupyter Notebookを動かすコンテナです
