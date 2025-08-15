@@ -33,10 +33,10 @@ https://gihyo.jp/book/2025/978-4-297-15074-7
 #### 8章 PyIceberg
 - [examples/ch8-pyiceberg.ipynb](examples/ch8-pyiceberg.ipynb)
 #### 9章 ユースケースとソリューションパターン
-- [examples/ch9-1-basic-pipeline.ipynb](examples/ch9-1-basic-pipeline.ipynb)
+- [examples/ch9-basic-pipeline.ipynb](examples/ch9-basic-pipeline.ipynb)
 - [examples/ch9-cdc.ipynb](examples/ch9-cdc.ipynb)
 - [examples/ch9-wap.ipynb](examples/ch9-wap.ipynb)
-- [examples/ch9-4-streaming.ipynb](examples/ch9-4-streaming.ipynb)
+- [examples/ch9-streaming.ipynb](examples/ch9-streaming.ipynb)
 
 ## ハンズオン環境の構成
 
