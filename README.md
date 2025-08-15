@@ -116,4 +116,5 @@ docker-compose up --build
 
 `localhost:9001`にアクセスするとログイン画面が表示されます。  
 
-UsernameとPasswordはdocker-compose.ymlに記載の通り、Username=admin, Password=passwordです。(適宜変更してください)  
+UsernameとPasswordはdocker-compose.ymlに記載の通り、Username=admin, Password=passwordです。(適宜変更してください)
+
