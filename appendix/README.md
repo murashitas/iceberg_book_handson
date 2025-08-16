@@ -10,6 +10,6 @@
   - マニフェストファイル
     - [18e47ad9-6557-47f0-ba53-f855647ab401-m0.avro](appendix/sample-iceberg-table/simple_table/metadata/18e47ad9-6557-47f0-ba53-f855647ab401-m0.avro)
 - [Icebergビューのサンプルデータ](appendix/sample-iceberg-view/sample_view/metadata/00000-bcbc7253-437c-447b-8c75-fba0d6313eac.gz.metadata.json)
-- [Iceberg テーブル仕様の詳細](appendix/iceberg-table-spec-detail/)
+- [Iceberg テーブルのフィールドリスト](appendix/iceberg-table-spec-detail/table_field_list.md)
 - [Iceberg フォーマットバージョン V3: Row Lineage](./row-lineage.md)
 - [Iceberg フォーマットバージョン V3: Deletion Vectors (削除ベクトル)](./deletion-vectors.md)
