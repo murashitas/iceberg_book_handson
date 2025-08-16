@@ -398,3 +398,110 @@ INSERT OVERWRITE db.sales_iceberg
 ```
 
 ## 高度な Iceberg 機能の利用
+
+### CTLT によるテーブルの作成
+
+```sql
+-- Iceberg テーブル sales_iceberg を作成
+CREATE TABLE db.sales_iceberg (
+    product_name string,
+    price decimal(10, 2),
+    customer_id bigint,
+    order_id string,
+    record_at timestamp,
+    category string,
+    PRIMARY KEY(`order_id`) NOT ENFORCED)
+PARTITIONED BY (category)
+WITH ('write.metadata.compression-codec'='gzip');
+
+-- CTLT により sales_iceberg を複製
+CREATE TABLE db.sales_iceberg_stg LIKE db.sales_iceberg;
+```
+
+### タイムトラベルクエリ
+
+```sql
+-- 現在のテーブルデータ
+SELECT * FROM db.sales_iceberg;
+/*
++---------------+-------+-------------+----------------+----------------------------+----------+
+|  product_name | price | customer_id |       order_id |                  record_at | category |
++---------------+-------+-------------+----------------+----------------------------+----------+
+|     green tea |  4.25 |        1921 | DR56NBVC34RT67 | 2025-04-26 16:58:23.000000 |    drink |
+|  orange juice |  3.50 |        1756 | OR78FNGH45TY92 | 2025-04-27 14:23:18.000000 |    drink |
+|         pasta |  1.75 |        1533 | GR67LKJU23RT98 | 2025-04-27 18:12:05.000000 |  grocery |
+| cutting board | 12.99 |        1842 | KB93HDRT56UJ21 | 2025-04-26 09:45:32.000000 |  kitchen |
+|   mixing bowl |  8.25 |        1695 | KB45PLMN78RT34 | 2025-04-25 11:36:47.000000 |  kitchen |
++---------------+-------+-------------+----------------+----------------------------+----------+
+*/
+
+-- 時間によるタイムトラベルクエリ (2025-04-29 11:31:00.000 をエポックミリ秒で指定)
+SELECT * FROM db.sales_iceberg /*+ OPTIONS('as-of-timestamp'='1745926260000') */;
+
+-- スナップショットによるタイムトラベルクエリ
+SELECT * FROM db.sales_iceberg /*+ OPTIONS('snapshot-id'='7822422519616713486') */;
+
+/* 各タイムトラベルクエリの出力結果
++--------------+-------+-------------+----------------+----------------------------+----------+
+| product_name | price | customer_id |       order_id |                  record_at | category |
++--------------+-------+-------------+----------------+----------------------------+----------+
+|    green tea |  4.25 |        1921 | DR56NBVC34RT67 | 2025-04-26 16:58:23.000000 |    drink |
+| orange juice |  3.50 |        1756 | OR78FNGH45TY92 | 2025-04-27 14:23:18.000000 |    drink |
+|        pasta |  1.75 |        1533 | GR67LKJU23RT98 | 2025-04-27 18:12:05.000000 |  grocery |
++--------------+-------+-------------+----------------+----------------------------+----------+
+*/
+```
+
+### Upsert によるデータの更新と追加
+
+以下に Upsert 対象のテーブル定義とそのレコードを示しています。
+
+```sql
+-- テーブル定義 (「プライマリキーの設定」と同様のテーブル定義)
+CREATE TABLE db.sales_iceberg (
+    product_name string,
+    price decimal(10, 2),
+    customer_id bigint,
+    order_id string,
+    record_at timestamp,
+    category string,
+    PRIMARY KEY(`order_id`) NOT ENFORCED);
+
+/* 現在のテーブルレコード
++---------------+-------+-------------+----------------+----------------------------+----------+
+|  product_name | price | customer_id |       order_id |                  record_at | category |
++---------------+-------+-------------+----------------+----------------------------+----------+
+|     green tea |  4.25 |        1921 | DR56NBVC34RT67 | 2025-04-26 16:58:23.000000 |    drink |
+|  orange juice |  3.50 |        1756 | OR78FNGH45TY92 | 2025-04-27 14:23:18.000000 |    drink |
+|         pasta |  1.75 |        1533 | GR67LKJU23RT98 | 2025-04-27 18:12:05.000000 |  grocery |
+| cutting board | 12.99 |        1842 | KB93HDRT56UJ21 | 2025-04-26 09:45:32.000000 |  kitchen |
+|   mixing bowl |  8.25 |        1695 | KB45PLMN78RT34 | 2025-04-25 11:36:47.000000 |  kitchen |
++---------------+-------+-------------+----------------+----------------------------+----------+
+*/
+```
+
+このテーブルに対して Upsert を実行します。Flink の場合は `INSERT OVERWRITE` 文を利用します。
+
+```sql
+INSERT INTO db.sales_iceberg /*+ OPTIONS('upsert-enabled'='true') */
+VALUES
+    ('lemonade', 2.75, 1921, 'DR56NBVC34RT67', TIMESTAMP '2025-04-26 17:00:56', 'drink'),
+    ('rice', 5.99, 1784, 'GR34FDSA78HJ90', TIMESTAMP '2025-04-26 19:27:42', 'grocery'),
+    ('frying pan', 24.99, 1825, 'KB78TYUI34GH56', TIMESTAMP '2025-04-25 12:46:31', 'kitchen');
+```
+
+Upsert 実行後以下の結果が得られます。
+
+```txt
++---------------+-------+-------------+----------------+----------------------------+----------+
+|  product_name | price | customer_id |       order_id |                  record_at | category |
++---------------+-------+-------------+----------------+----------------------------+----------+
+|      lemonade |  2.75 |        1921 | DR56NBVC34RT67 | 2025-04-26 17:00:56.000000 |    drink | // <= 更新
+|  orange juice |  3.50 |        1756 | OR78FNGH45TY92 | 2025-04-27 14:23:18.000000 |    drink |
+|         pasta |  1.75 |        1533 | GR67LKJU23RT98 | 2025-04-27 18:12:05.000000 |  grocery |
+|          rice |  5.99 |        1784 | GR34FDSA78HJ90 | 2025-04-26 19:27:42.000000 |  grocery | // <= 追加
+| cutting board | 12.99 |        1842 | KB93HDRT56UJ21 | 2025-04-26 09:45:32.000000 |  kitchen |
+|   mixing bowl |  8.25 |        1695 | KB45PLMN78RT34 | 2025-04-25 11:36:47.000000 |  kitchen |
+|    frying pan | 24.99 |        1825 | KB78TYUI34GH56 | 2025-04-25 12:46:31.000000 |  kitchen | // <= 追加
++---------------+-------+-------------+----------------+----------------------------+----------+
+```
