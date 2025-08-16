@@ -185,4 +185,7 @@ warehouse
 notebooks
 !spark/notebooks
 
+# Other files
+./examples/weather_data.parquet
+
 .vscode
