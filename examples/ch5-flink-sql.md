@@ -21,7 +21,7 @@ $ docker compose run flink-sql-client
 Flink SQL クライアントが正常に起動すると、以下のような出力が表示されます。
 
 ```txt
-$  podman compose run flink-sql-client
+$ podman compose run flink-sql-client
 
 [+] Creating 1/1
  ✔ Container flink-jobmanager  Running
@@ -245,7 +245,6 @@ CREATE TABLE db.sales_iceberg (
 以下の例では、テーブルロケーションをカスタマイズしています。
 
 ```sql
--- Iceberg テーブルロケーションを変更する
 CREATE TABLE db.sales_iceberg (
     product_name string,
     price double,
@@ -259,7 +258,6 @@ WITH ('location'='s3://amzn-s3-demo-bucket/custom-path');
 以下の例は、テーブルロケーションをカスタマイズし、Icebergテーブルのメタデータファイルをgzip形式で圧縮するように設定しています。
 
 ```sql
--- Iceberg テーブルロケーションを変更し、テーブルメタデータファイルの圧縮形式を gzip に設定
 CREATE TABLE db.sales_iceberg (
     product_name string,
     price decimal(10, 2),
@@ -275,8 +273,9 @@ WITH (
 
 #### テーブルパーティションの設定
 
+以下の例では、`category` カラムでパーティションニングした `sales_iceberg` テーブルを作成しています。
+
 ```sql
--- category カラムでパーティションニングした sales_iceberg テーブルを作成する
 CREATE TABLE db.sales_iceberg (
     product_name string,
     price decimal(10, 2),
@@ -288,6 +287,8 @@ PARTITIONED BY (category);
 ```
 
 #### プライマリーキーの設定
+
+以下の例では、`order_id` カラムをプライマリーキーとして指定しています。
 
 ```sql
 CREATE TABLE db.sales_iceberg (
@@ -302,5 +303,98 @@ CREATE TABLE db.sales_iceberg (
 ```
 
 ### データの読み込み
+
+```sql
+-- バッチクエリ
+SELECT product_name, price, customer_id, order_id, record_at, category
+FROM db.sales_iceberg;
+
+-- ストリーミングクエリ
+SELECT product_name, price, customer_id, order_id, record_at, category
+FROM db.sales_iceberg /*+ OPTIONS('streaming'='true') */;
+```
+
+以下の例は、10 秒間隔でソースを監視するストリーミングクエリです。
+
+```sql
+SELECT product_name, price, customer_id, order_id, record_at, category
+FROM db.sales_iceberg /*+ OPTIONS('streaming'='true', 'monitor-interval'='10s') */;
+```
+
+### データの書き込み
+
+#### INSERT INTO によるデータの書き込み
+
+```sql
+-- 作成したテーブルにレコードを追加する
+INSERT INTO db.sales_iceberg VALUES
+    ('orange juice', 3.50, 1756, 'OR78FNGH45TY92', TIMESTAMP '2025-04-27 14:23:18', 'drink'),
+    ('cutting board', 12.99, 1842, 'KB93HDRT56UJ21', TIMESTAMP '2025-04-26 09:45:32', 'kitchen'),
+    ('pasta', 1.75, 1533, 'GR67LKJU23RT98', TIMESTAMP '2025-04-27 18:12:05', 'grocery'),
+    ('mixing bowl', 8.25, 1695, 'KB45PLMN78RT34', TIMESTAMP '2025-04-25 11:36:47', 'kitchen'),
+    ('green tea', 4.25, 1921, 'DR56NBVC34RT67', TIMESTAMP '2025-04-26 16:58:23', 'drink');
+```
+
+#### INSERT OVERWRITE によるデータの上書き
+
+```sql
+/* 最初の Iceberg テーブルデータ (SELECT * FROM db.sales_iceberg の出力結果)
++---------------+-------+-------------+----------------+----------------------------+----------+
+|  product_name | price | customer_id |       order_id |                  record_at | category |
++---------------+-------+-------------+----------------+----------------------------+----------+
+|  orange juice |  3.50 |        1756 | OR78FNGH45TY92 | 2025-04-27 14:23:18.000000 |    drink |
+| cutting board | 12.99 |        1842 | KB93HDRT56UJ21 | 2025-04-26 09:45:32.000000 |  kitchen |
+|         pasta |  1.75 |        1533 | GR67LKJU23RT98 | 2025-04-27 18:12:05.000000 |  grocery |
+|   mixing bowl |  8.25 |        1695 | KB45PLMN78RT34 | 2025-04-25 11:36:47.000000 |  kitchen |
+|     green tea |  4.25 |        1921 | DR56NBVC34RT67 | 2025-04-26 16:58:23.000000 |    drink |
++---------------+-------+-------------+----------------+----------------------------+----------+
+*/
+
+-- INSERT OVERWRITE によるテーブルデータの上書き
+INSERT OVERWRITE db.sales_iceberg VALUES
+  ('sparkling water', 1.25, 1876, 'DR67QWER12TY45', TIMESTAMP '2025-04-25 15:41:08', 'drink');
+
+/* INSERT OVERWRITE 実行後のテーブルデータ (SELECT * FROM db.sales_iceberg の出力結果)
++-----------------+-------+-------------+----------------+----------------------------+----------+
+|    product_name | price | customer_id |       order_id |                  record_at | category |
++-----------------+-------+-------------+----------------+----------------------------+----------+
+| sparkling water |  1.25 |        1876 | DR67QWER12TY45 | 2025-04-25 15:41:08.000000 |    drink |
++-----------------+-------+-------------+----------------+----------------------------+----------+
+*/
+```
+
+以下の例は、テーブルがパーティショニングされている場合における**動的パーティション書き込み**の実行結果を示しています。
+
+```sql
+/* INSERT OVERWRITE 実行前のテーブルデータ (SELECT * FROM db.sales_iceberg の出力結果)
++---------------+-------+-------------+----------------+----------------------------+----------+
+|  product_name | price | customer_id |       order_id |                  record_at | category |
++---------------+-------+-------------+----------------+----------------------------+----------+
+|  orange juice |  3.50 |        1756 | OR78FNGH45TY92 | 2025-04-27 14:23:18.000000 |    drink |
+|     green tea |  4.25 |        1921 | DR56NBVC34RT67 | 2025-04-26 16:58:23.000000 |    drink |
+| cutting board | 12.99 |        1842 | KB93HDRT56UJ21 | 2025-04-26 09:45:32.000000 |  kitchen |
+|   mixing bowl |  8.25 |        1695 | KB45PLMN78RT34 | 2025-04-25 11:36:47.000000 |  kitchen |
+|         pasta |  1.75 |        1533 | GR67LKJU23RT98 | 2025-04-27 18:12:05.000000 |  grocery |
++---------------+-------+-------------+----------------+----------------------------+----------+
+*/
+
+-- 動的パーティションモードでの実行
+INSERT OVERWRITE db.sales_iceberg
+    SELECT * FROM (
+    VALUES
+        ('sparkling water', 1.25, 1876, 'DR67QWER12TY45', TIMESTAMP '2025-04-25 15:41:08', 'drink')
+    ) AS t (product_name, price, customer_id, order_id, record_at, category);
+
+/* INSERT OVERWRITE 実行後のテーブルデータ (SELECT * FROM db.sales_iceberg の出力結果)
++-----------------+-------+-------------+----------------+----------------------------+----------+
+|    product_name | price | customer_id |       order_id |                  record_at | category |
++-----------------+-------+-------------+----------------+----------------------------+----------+
+| sparkling water |  1.25 |        1876 | DR67QWER12TY45 | 2025-04-25 15:41:08.000000 |    drink |
+|           pasta |  1.75 |        1533 | GR67LKJU23RT98 | 2025-04-27 18:12:05.000000 |  grocery |
+|   cutting board | 12.99 |        1842 | KB93HDRT56UJ21 | 2025-04-26 09:45:32.000000 |  kitchen |
+|     mixing bowl |  8.25 |        1695 | KB45PLMN78RT34 | 2025-04-25 11:36:47.000000 |  kitchen |
++-----------------+-------+-------------+----------------+----------------------------+----------+
+*/
+```
 
 ## 高度な Iceberg 機能の利用
