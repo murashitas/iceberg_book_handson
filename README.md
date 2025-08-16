@@ -30,6 +30,8 @@ https://gihyo.jp/book/2025/978-4-297-15074-7
 #### 6章 Trino
 - [examples/ch6-trino.ipynb](examples/ch6-trino.ipynb)
 #### 7章 Apache Hive
+- [examples/ch7-hive.md](examples/ch7-hive.md)
+
 #### 8章 PyIceberg
 - [examples/ch8-pyiceberg.ipynb](examples/ch8-pyiceberg.ipynb)
 #### 9章 ユースケースとソリューションパターン
