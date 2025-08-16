@@ -20,7 +20,7 @@ $ docker compose run flink-sql-client
 
 Flink SQL クライアントが正常に起動すると、以下のような出力が表示されます。
 
-```txt
+```
 $ podman compose run flink-sql-client
 
 [+] Creating 1/1
@@ -492,7 +492,7 @@ VALUES
 
 Upsert 実行後以下の結果が得られます。
 
-```txt
+```
 +---------------+-------+-------------+----------------+----------------------------+----------+
 |  product_name | price | customer_id |       order_id |                  record_at | category |
 +---------------+-------+-------------+----------------+----------------------------+----------+
