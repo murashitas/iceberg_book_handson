@@ -35,6 +35,7 @@ https://gihyo.jp/book/2025/978-4-297-15074-7
 #### 9章 ユースケースとソリューションパターン
 - [examples/ch9-basic-pipeline.ipynb](examples/ch9-basic-pipeline.ipynb)
 - [examples/ch9-cdc.ipynb](examples/ch9-cdc.ipynb)
+- [examples/ch9-scd-type2.ipynb](examples/ch9-scd-type2.ipynb)
 - [examples/ch9-wap.ipynb](examples/ch9-wap.ipynb)
 - [examples/ch9-streaming.ipynb](examples/ch9-streaming.ipynb)
 
@@ -125,3 +126,14 @@ UsernameとPasswordはdocker-compose.ymlに記載の通り、Username=admin, Pas
 1. ローカルのWebブラウザ経由で`localhost:9001`にアクセスし、ログインします
 2. ログイン後、画面右上に表示されている**Create new path**より、バケット配下にパスを作成できます
 3. 画面右上に表示されている**Upload**を選択し、**Upload File**を選択します。その後アップロードするファイルを選択することで、現在のパス配下にファイルをアップロードできます
+
+## QA
+### テスト環境が正常に動作しない
+何らかの理由で、Icebergカタログ等に不整合が発生している可能性があります。以下のコマンドでコンテナを停止し、再構築を行ってください。
+
+```bash
+docker-compose down
+docker-compose up --build
+```
+
+不明点や、問題が発生した場合は、GitHubのIssuesを起票してください。
