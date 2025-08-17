@@ -2,27 +2,27 @@
 
 削除ベクトル（Deletion Vectors）は、Apache Iceberg フォーマットバージョン 3 で導入された新機能で、行レベルの削除情報を効率的に管理する仕組みです。この仕様はプルリクエスト [#11240](https://github.com/apache/iceberg/pull/11240) で確定しました。
 
-削除ベクトルは、従来の**位置指定削除ファイル**と同じ情報（削除対象レコードのファイル名と行位置）を含みますが、ビットマップ形式で保存することで、効率化を実現しています。この効率性の向上により、フォーマットバージョン 3 では**位置指定削除ファイルが廃止**されることが [Table Spec](https://iceberg.apache.org/spec/#position-delete-files) に記載されています。
+削除ベクトルは、従来の**位置指定削除ファイル**と同じ情報（削除対象レコードのファイル名と行位置）を含みますが、ビットマップ形式で保存することで効率化を実現しています。また、フォーマットバージョン 3 では**位置指定削除ファイルが廃止**されることが [Table Spec](https://iceberg.apache.org/spec/#position-delete-files) に記載されています。
 
-## 主な特徴
+以下にその特徴を示しています。
 
-* **対応バージョン**: Iceberg (Java) 1.8.0 以降で利用可能[^engine]
-* **格納形式**: `deletion-vector-v1` ブロブタイプとして Puffin ファイルに格納（従来のバージョン 2 では Parquet 形式で保存）
-* **データ構造**: [Roaring bitmaps](https://roaringbitmap.org/) によるビットマップ形式（Delta Lake と同様の実装）
-* **パフォーマンス**: 削除ファイルのサイズが大幅に削減され、読み書き性能が向上
+* Iceberg (Java) 1.8.0 以上で利用可能[^engine]
+* 削除ベクトルは、`deletion-vector-v1` ブロブタイプとして Puffin に格納される (フォーマットバージョン 2 では、Apache Parquet 形式のファイルに、削除対象のレコードを含むファイルパスと削除対象の行が保存されていた)
+* 削除ベクトル自体は、[Roaring bitmaps](https://roaringbitmap.org/) を利用しビットマップ形式で保存される (Delta Lake における削除ベクトルと同様の方式)
+* フォーマットバージョン 2 に比べ、生成される削除ファイルのサイズが小さく、削除ファイルの書き込み・読み込みを高速化できる
 
 [^engine]: 2025年8月17日時点で、本書で扱うエンジン（Apache Spark、Apache Flink、Trino、Apache Hive）のうち、Apache Spark（バージョン 3.4、3.5、4.0）のみが削除ベクトルをサポートしています。
 
 ## 削除ベクトルの利用方法
 
-削除ベクトルを利用するには、以下の2つの条件を満たす必要があります：
+削除ベクトルを利用するには、以下の 2 つの条件を満たす必要があります:
 
 1. Iceberg テーブルのフォーマットバージョンを 3 に設定する
 2. 使用するエンジンが削除ベクトルの読み書きに対応している
 
 ### テーブルフォーマットバージョンの設定
 
-Spark SQL を使用した設定例を示します：
+Spark SQL を使用した設定例を示します:
 
 ```sql
 -- テーブル作成時にフォーマットバージョン 3 を指定
@@ -140,9 +140,9 @@ s3://amzn-s3-demo-bucket/db/sales_iceberg
 > [!INFO]
 > 追加の削除操作を実行すると（例：`DELETE FROM my_catalog.db.sales_iceberg WHERE product_name = 'cocoa'`）、新しい Puffin ファイルが生成されます。この新しいファイルには、既存の削除情報と新規の削除情報の両方が含まれます。
 
-## Puffin ファイルの内部構造
+## Puffin ファイルおよび deletion-vector-v1 ブロブの内部構造
 
-### Puffin フォーマットの概要
+### Puffin フォーマットの構造
 
 Puffin フォーマットは、マジックナンバー `PFA1` で始まるバイナリ形式のファイルです（詳細は [Puffin spec](https://iceberg.apache.org/puffin-spec/) を参照）。このフォーマットの **Blobs** セクションには、様々な形式のデータを格納できます。削除ベクトルは `deletion-vector-v1` ブロブタイプとして、このセクションに保存されます。
 
