@@ -1,10 +1,11 @@
 # 実践 Apache Iceberg —— ハンズオン環境と付録
 
-『実践 Apache Iceberg』のハンズオン環境と、付録コンテンツを提供するリポジトリです。  
-https://gihyo.jp/book/2025/978-4-297-15074-7
+<a href=https://gihyo.jp/book/2025/978-4-297-15074-7><img src="https://gihyo.jp/assets/images/cover/2025/9784297150747.jpg" alt="実践 Apache Iceberg" height="256px"></a>
+
+『実践 Apache Iceberg』のハンズオン環境と、付録コンテンツを提供するリポジトリです。
 
 - ハンズオン環境：以下のREADME.mdを参照してください
-- 付録コンテンツ：[appendix/README.md](appendix/README.md)を参照してください
+- 付録コンテンツ：[appendix](./appendix/README.md)を参照してください
 
 ## ハンズオン環境について
 
@@ -17,7 +18,9 @@ https://gihyo.jp/book/2025/978-4-297-15074-7
 > 本環境はあくまでも実験用で、最小限のマシンリソースで簡易的な検証を実現することに主眼を置いています。本番環境での運用を想定した設計ではないため、本番向けにはパフォーマンスやセキュリティ、信頼性などの非機能面を考慮した追加の設計の検討が必要である点に注意してください。
 
 ## ハンズオンコンテンツ一覧
+
 各章とハンズオンコンテンツの対応は以下の通りです。
+
 #### 2章 Apache Icebergの仕組みと機能
 - [examples/ch2-query-lifecycle.ipynb](examples/ch2-query-lifecycle.ipynb)
 #### 3章 Icebergカタログとストレージ
