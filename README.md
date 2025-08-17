@@ -1,10 +1,11 @@
 # 実践 Apache Iceberg —— ハンズオン環境と付録
 
-『実践 Apache Iceberg』のハンズオン環境と、付録コンテンツを提供するリポジトリです。  
-https://gihyo.jp/book/2025/978-4-297-15074-7
+<a href=https://gihyo.jp/book/2025/978-4-297-15074-7><img src="https://gihyo.jp/assets/images/cover/2025/9784297150747.jpg" alt="実践 Apache Iceberg" height="256px"></a>
+
+『実践 Apache Iceberg』のハンズオン環境と、付録コンテンツを提供するリポジトリです。
 
 - ハンズオン環境：以下のREADME.mdを参照してください
-- 付録コンテンツ：[appendix/README.md](appendix/README.md)を参照してください
+- 付録コンテンツ：[appendix](./appendix/README.md)を参照してください
 
 ## ハンズオン環境について
 
