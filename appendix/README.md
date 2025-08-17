@@ -1,4 +1,5 @@
 # 実践 Apache Iceberg —— 付録
+
 本文の内容を補完する付録を用意しました。本書の内容と併せてご覧ください。
 
 - [Icebergテーブルのサンプルメタデータ](sample-iceberg-table/)

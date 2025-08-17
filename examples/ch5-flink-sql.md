@@ -71,6 +71,8 @@ Successfully initialized from sql script: file:/opt/flink/init.sql
         Welcome! Enter 'HELP;' to list all available commands. 'QUIT;' to exit.
 
 Command history file path: /opt/flink/.flink-sql-history
+
+Flink SQL>
 ```
 
 なお、本ハンズオン環境においては、上記コマンドを実行した際に、`flink/setup` 配下における `init.sql` が実行され、Iceberg REST カタログを利用するようセッションが自動で設定されます。
