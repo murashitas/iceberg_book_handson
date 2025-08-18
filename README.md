@@ -43,6 +43,8 @@
 - [examples/ch9-scd-type2.ipynb](examples/ch9-scd-type2.ipynb)
 - [examples/ch9-wap.ipynb](examples/ch9-wap.ipynb)
 - [examples/ch9-streaming.ipynb](examples/ch9-streaming.ipynb)
+#### 11章 運用管理
+- [examples/ch11-data-life-cycle.ipynb](./examples/ch11-data-life-cycle.ipynb)
 
 ## ハンズオン環境の構成
 
