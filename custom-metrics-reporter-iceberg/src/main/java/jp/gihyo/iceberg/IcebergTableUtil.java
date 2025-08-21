@@ -165,7 +165,6 @@ public class IcebergTableUtil {
         }
 
         record.setField("metadata", report.metadata());
-        LOG.warn(record.toString());
         return record;
     }
 
