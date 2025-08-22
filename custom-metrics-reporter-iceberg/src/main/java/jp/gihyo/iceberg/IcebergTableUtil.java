@@ -200,7 +200,6 @@ public class IcebergTableUtil {
         }
 
         record.setField("metadata", report.metadata());
-        LOG.warn(record.toString());
         return record;
     }
 
@@ -224,13 +223,11 @@ public class IcebergTableUtil {
             Table table,
             List<T> reports,
             Function<T, Record> metricsReportToRecord) throws NoSuchTableException {
-        
-        // Convert reports to Records
+
         List<Record> records = reports.stream()
                 .map(metricsReportToRecord)
                 .toList();
-        
-        // Convert Records to Rows using Spark's built-in capabilities
+
         List<Row> sparkRows = records.stream()
                 .map(record -> recordToSparkRow(record, table.schema()))
                 .toList();
