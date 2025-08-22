@@ -45,6 +45,7 @@
 - [examples/ch9-streaming.ipynb](examples/ch9-streaming.ipynb)
 #### 11章 運用管理
 - [examples/ch11-data-life-cycle.ipynb](./examples/ch11-data-life-cycle.ipynb)
+- [examples/ch11-iceberg-metrics.ipynb](./examples/ch11-iceberg-metrics.ipynb)
 
 ## ハンズオン環境の構成
 
