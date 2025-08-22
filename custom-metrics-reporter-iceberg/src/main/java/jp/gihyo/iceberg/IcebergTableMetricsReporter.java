@@ -1,5 +1,6 @@
 package jp.gihyo.iceberg;
 
+import com.google.common.base.Preconditions;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.Table;
 import org.apache.iceberg.catalog.Catalog;
@@ -15,8 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 public class IcebergTableMetricsReporter implements MetricsReporter {
-    private static final String CATALOG_NAME = "catalog-name";
-    private static final String CATALOG_NAME_DEFAULT = "metrics_catalog";
+    private static final String CATALOG_NAME = "metrics-catalog-name";
     private static final String NAMESPACE = "ns";
     private static final String NAMESPACE_DEFAULT = "db";
     private static final String TABLE_NAME_PREFIX = "table-prefix";
@@ -29,6 +29,7 @@ public class IcebergTableMetricsReporter implements MetricsReporter {
 
     @Override
     public void initialize(Map<String, String> properties) {
+        Preconditions.checkArgument(properties.containsKey(CATALOG_NAME), "Missing required property '%s'", CATALOG_NAME);
         this.properties = properties;
     }
 
@@ -58,7 +59,7 @@ public class IcebergTableMetricsReporter implements MetricsReporter {
     }
 
     private void initializeCatalog() {
-        String catalogName = properties.getOrDefault(CATALOG_NAME, CATALOG_NAME_DEFAULT);
+        String catalogName = properties.get(CATALOG_NAME);
         Catalog catalog = new RESTCatalog();
         catalog.initialize(catalogName, properties);
         this.catalog = catalog;
