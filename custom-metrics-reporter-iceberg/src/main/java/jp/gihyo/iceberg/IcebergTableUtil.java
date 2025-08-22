@@ -145,7 +145,6 @@ public class IcebergTableUtil {
         record.setField("projected_field_ids", report.projectedFieldIds());
         record.setField("projected_field_names", report.projectedFieldNames());
 
-        // Scan metrics
         ScanMetricsResult metrics = report.scanMetrics();
         if (metrics != null) {
             if (metrics.totalPlanningDuration() != null) {
@@ -177,7 +176,6 @@ public class IcebergTableUtil {
         record.setField("sequence_number", report.sequenceNumber());
         record.setField("operation", report.operation());
 
-        // Commit metrics
         CommitMetricsResult metrics = report.commitMetrics();
         if (metrics != null) {
             if (metrics.totalDuration() != null) {
@@ -200,7 +198,6 @@ public class IcebergTableUtil {
         }
 
         record.setField("metadata", report.metadata());
-        LOG.warn(record.toString());
         return record;
     }
 
@@ -224,13 +221,11 @@ public class IcebergTableUtil {
             Table table,
             List<T> reports,
             Function<T, Record> metricsReportToRecord) throws NoSuchTableException {
-        
-        // Convert reports to Records
+
         List<Record> records = reports.stream()
                 .map(metricsReportToRecord)
                 .toList();
-        
-        // Convert Records to Rows using Spark's built-in capabilities
+
         List<Row> sparkRows = records.stream()
                 .map(record -> recordToSparkRow(record, table.schema()))
                 .toList();
@@ -241,6 +236,8 @@ public class IcebergTableUtil {
         String currentCatalog = spark.catalog().currentCatalog();
         String metricsCatalogName = table.name().split("\\.")[0];
         spark.catalog().setCurrentCatalog(metricsCatalogName);
+
+        LOG.info("Writing metrics report to {}", table.name());
         df.writeTo(table.name()).append();
         spark.catalog().setCurrentCatalog(currentCatalog);
     }
@@ -250,7 +247,6 @@ public class IcebergTableUtil {
         int i = 0;
         for (Types.NestedField field : schema.columns()) {
             Object value = record.getField(field.name());
-            // Convert OffsetDateTime to java.sql.Timestamp for Spark compatibility
             if (value instanceof OffsetDateTime offsetDateTime) {
                 value = java.sql.Timestamp.from(offsetDateTime.toInstant());
             }
