@@ -14,3 +14,4 @@
 - [Iceberg テーブルのフィールドリスト](appendix/iceberg-table-spec-detail/table_field_list.md)
 - [Iceberg フォーマットバージョン V3: Row Lineage (行レベルリネージ)](./row-lineage.md)
 - [Iceberg フォーマットバージョン V3: Deletion Vectors (削除ベクトル)](./deletion-vectors.md)
+- [メタデータテーブルクエリ例]](./metadata-table-query-examples.md)
