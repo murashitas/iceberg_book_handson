@@ -12,7 +12,8 @@ services:
       start-notebook.sh --NotebookApp.token=''"
     volumes:
       - ./examples:/home/jovyan/examples/
-      - data:/home/jovyan/data/
+      - ./data:/home/jovyan/data/
+      - ./jar:/home/jovyan/jar/
       - ./.pyiceberg.yaml:/home/jovyan/.pyiceberg.yaml
     environment:
       - AWS_ACCESS_KEY_ID=admin
