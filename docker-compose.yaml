@@ -69,7 +69,7 @@ services:
       - 9000:9000
 
   minio-console:
-    image: bitnami/minio-object-browser:latest
+    image: bitnamilegacy/minio-object-browser:latest
     container_name: minio-console
     entrypoint: ["/opt/bitnami/minio-object-browser/bin/console", "server"]
     environment:
