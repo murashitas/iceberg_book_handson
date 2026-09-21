@@ -2,7 +2,7 @@ FROM apache/hive:4.0.1
 
 USER root
 
-RUN apt-get update && apt-get install -y curl
+RUN sed -i '/bullseye-security/d' /etc/apt/sources.list && apt-get update && apt-get install -y curl
 
 RUN curl https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.6/hadoop-aws-3.3.6.jar -o /opt/hive/lib/hadoop-aws-3.3.6.jar && \
     curl https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-hive-runtime/1.4.3/iceberg-hive-runtime-1.4.3.jar -o /opt/hive/lib/iceberg-hive-runtime-1.4.3.jar && \
